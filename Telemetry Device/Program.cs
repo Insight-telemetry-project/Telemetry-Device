@@ -1,14 +1,20 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks.Dataflow;
+using Telemetry_Device.Models;
+using Telemetry_Device.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+// Register DI
+builder.Services.AddSingleton<FieldMapping>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -19,5 +25,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+var readerBlock = PcapProcessor.CreatePcapReaderBlock();
 
 app.Run();
