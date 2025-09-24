@@ -7,7 +7,7 @@ using System.Threading.Tasks.Dataflow;
 using Telemetry_Device.Models;
 using Telemetry_Device.Models.Interface;
 using Telemetry_Device.Models.Packets;
-using Telemetry_Device.Services;
+using Telemetry_Device.Services.TplDataflowBlocks;
 
 namespace Telemetry_Device.Controllers
 {
@@ -15,46 +15,27 @@ namespace Telemetry_Device.Controllers
     [Route("api/[controller]")]
     public class PacketsController : ControllerBase
     {
-        private readonly IPcapProcessor _pcapProcessor;
-        private readonly DecoderBlock _decoder;
-        private readonly IWebHostEnvironment _env;
+        private readonly PacketPipelineService _pipeline;
 
-        public PacketsController(IPcapProcessor pcapProcessor, DecoderBlock decoder, IWebHostEnvironment env)
+        public PacketsController(PacketPipelineService pipeline)
         {
-            _pcapProcessor = pcapProcessor;
-            _decoder = decoder;
-            _env = env;
+            _pipeline = pipeline;
         }
 
-        [HttpGet("check-local")]
-        public async Task<IActionResult> CheckLocal([FromQuery] string fileName)
+        [HttpGet("decode-local")]
+        public async Task<IActionResult> DecodeLocal([FromQuery] string fileName)
         {
             if (string.IsNullOrWhiteSpace(fileName))
                 return BadRequest("fileName is required");
 
-            var fullPath = Path.Combine(_env.ContentRootPath, "Common", "Data", "5.pcap");
+
+            string fullPath = Path.Combine( "Data", fileName);
+
+
             if (!System.IO.File.Exists(fullPath))
                 return NotFound($"File not found: {fullPath}");
 
-            var packets = _pcapProcessor.ReadPacketsFromFile(fullPath);
-            var decoderBlock = _decoder.CreateDecoderBlock();
-
-            int count = 0;
-            foreach (var packet in packets)
-            {
-                if (count++ >= 5) break;
-                await decoderBlock.SendAsync(packet);
-            }
-            decoderBlock.Complete();
-
-            var decodedList = new List<DictionaryPacket>();
-            while (await decoderBlock.OutputAvailableAsync())
-            {
-                while (decoderBlock.TryReceive(out var decoded))
-                {
-                    decodedList.Add(decoded);
-                }
-            }
+            List<DictionaryPacket> decodedList = await _pipeline.RunAsync(fullPath);
 
             return Ok(decodedList);
         }

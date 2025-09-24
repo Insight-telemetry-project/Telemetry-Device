@@ -1,0 +1,12 @@
+﻿using System.Threading.Tasks.Dataflow;
+using Telemetry_Device.Models.Packets;
+
+namespace Telemetry_Device.Models.Interface.TplDataflowBlocks
+{
+    public interface IDecoderBlock
+    {
+        double DecodeField(PacketData packet, IcdField icdField);
+
+        TransformBlock<PacketData, DictionaryPacket> CreateDecoderBlock();
+    }
+}

@@ -16,16 +16,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Common\Data\5.pcap">
+    <None Update="Data\5.pcap">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Common\Data\index_23517_time_17673.pcap">
+    <None Update="Data\index_23517_time_17673.pcap">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Common\Data\index_23517_time_17673.pcap">
+    <None Update="Data\index_23517_time_17673.pcap">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Common\Data\test.pcap">
+    <None Update="Data\test.pcap">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -3,8 +3,9 @@ using System.Threading.Tasks.Dataflow;
 using Telemetry_Device.Models.Interface;
 using Telemetry_Device.Models.Packets;
 using Telemetry_Device.Models.Constant;
+using Telemetry_Device.Models.Interface.TplDataflowBlocks;
 
-public class DecoderBlock
+public class DecoderBlock : IDecoderBlock
 {
     private readonly IBitEncoder _bitEncoder;
     private readonly List<IcdField> _icd;
@@ -31,7 +32,7 @@ public class DecoderBlock
             return decodedPacket;
         });
     }
-    private double DecodeField(PacketData packet, IcdField icdField)
+    public double DecodeField(PacketData packet, IcdField icdField)
     {
         int absoluteOffset = ConstantPackets.HEADER_BIT_OFFSET + icdField.BitOffset;
         ulong rawValue = _bitEncoder.ReadBits(packet.PayloadPacket, absoluteOffset, icdField.SizeBits);
