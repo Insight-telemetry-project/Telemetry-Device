@@ -1,4 +1,4 @@
-﻿using SendRecieveUDP.Model.Constant;
+using SendRecieveUDP.Model.Constant;
 
 namespace Telemetry_Device.Models.Constant
 {
