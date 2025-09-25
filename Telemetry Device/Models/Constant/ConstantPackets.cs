@@ -16,8 +16,6 @@ namespace Telemetry_Device.Models.Constant
         public const ushort FIXED_UDP_LENGTH = 57;
         public const int FRAME_IP_HEADER_OFFSET = 4;
         public const int FRAME_UDP_HEADER_OFFSET = 24;
-
-        
     }
 }
 

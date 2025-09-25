@@ -29,6 +29,7 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
         {
             using FileStream fileStream = new FileStream(pcapFilePath, FileMode.Open, FileAccess.Read);
             using BinaryReader binaryReader = new BinaryReader(fileStream);
+
             binaryReader.ReadBytes(ConstantPackets.GLOBAL_HEADER_SIZE);
 
             while (binaryReader.BaseStream.Position < binaryReader.BaseStream.Length)
@@ -41,7 +42,6 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
                 }
             }
         }
-
         public ITargetBlock<string> Input => _transformBlock;
         public ISourceBlock<PacketData> Output => _transformBlock;
 
@@ -65,4 +65,8 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
             };
         }
     }
+
 }
+
+
+
