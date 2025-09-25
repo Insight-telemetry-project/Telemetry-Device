@@ -1,4 +1,5 @@
 ﻿using SendRecieveUDP.Model.Constant;
+using SendRecieveUDP.Service.BitManipulation;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks.Dataflow;
@@ -24,7 +25,10 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
                 while (binaryReader.BaseStream.Position < binaryReader.BaseStream.Length)
                 {
                     PacketData packet = ReadSinglePacket(binaryReader);
-                    buffer.Post(packet); 
+                    if (ComputeUdpChecksum(packet.PayloadPacket) == packet.ChecksumPacket)
+                    {
+                        buffer.Post(packet);
+                    }
                 }
 
                 buffer.Complete();
@@ -41,7 +45,6 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
             _ = reader.ReadUInt32(); // originalLength
 
             byte[] payload = reader.ReadBytes((int)includedLength);
-
             byte udpChecksumMsb = payload[ConstantPackets.UDP_CHECKSUM_HIGH_BYTE_INDEX];
             byte udpChecksumLsb = payload[ConstantPackets.UDP_CHECKSUM_LOW_BYTEINDEX];
 
@@ -53,9 +56,43 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
                 ChecksumPacket = checksum
             };
         }
+
+
+
+
+
+
+
+        public ushort ComputeUdpChecksum(byte[] frame)
+        {
+            uint checksum = 0;
+            for (int offset = ConstantPackets.START_IP_HEADER; offset <= ConstantPackets.END_IP_HEADER; offset += 2)
+                AddWord(ref checksum, (ushort)((frame[ConstantPackets.FRAME_IP_HEADER_OFFSET + offset] << ConstantBits.BITS_IN_BYTE)
+                                             | frame[ConstantPackets.FRAME_IP_HEADER_OFFSET + offset + 1]));
+
+            AddWord(ref checksum, ConstantNetwork.UDP_PROTOCOL_NUMBER);
+            AddWord(ref checksum, ConstantPackets.FIXED_UDP_LENGTH);
+
+            for (int udpWordOffset = 0; udpWordOffset < ConstantPackets.FIXED_UDP_LENGTH; udpWordOffset += 2)
+            {
+                if (udpWordOffset != ConstantPackets.CHECKSUM_OFFSET)
+                {
+                    int frameByteIndex = ConstantPackets.FRAME_UDP_HEADER_OFFSET + udpWordOffset;
+                    byte highByte = frame[frameByteIndex];
+                    byte lowByte = (udpWordOffset + 1 < ConstantPackets.FIXED_UDP_LENGTH) ? frame[frameByteIndex + 1] : (byte)0;
+
+                    AddWord(ref checksum, (ushort)((highByte << ConstantBits.BITS_IN_BYTE) | lowByte));
+                }
+            }
+            return (ushort)~checksum;
+        }
+
+        public void AddWord(ref uint sum, ushort word)
+        {
+            sum += word;
+            sum = (sum & 0xFFFF) + (sum >> ConstantBits.WORD);
+        }
+
     }
 
 }
-
-
-

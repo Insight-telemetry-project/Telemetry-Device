@@ -10,5 +10,7 @@ namespace SendRecieveUDP.Model.Constant
     {
         public const int UDP_PORT = 5000;
         public const string LOOPBACK_ADDRESS = "127.0.0.1";
+        public const ushort UDP_PROTOCOL_NUMBER = 0x0011;
+
     }
 }
