@@ -12,5 +12,7 @@ namespace SendRecieveUDP.Model.Constant
         public const int STARTING_INDEX = 1;
         public const int NO_OFFSET = 0;
         public const int WORD = 16;
+        public const int WORD_SIZE_BYTES = 2;
+
     }
 }
