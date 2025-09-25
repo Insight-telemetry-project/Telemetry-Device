@@ -2,8 +2,10 @@ using SendRecieveUDP.Model.Interfaces.BitManipulation;
 using SendRecieveUDP.Service.BitManipulation;
 using System.Text.Json;
 using Telemetry_Device.Models.Interface;
+using Telemetry_Device.Models.Interface.Networking;
 using Telemetry_Device.Models.Interface.TplBlocks;
 using Telemetry_Device.Models.Interface.TplDataflowBlocks;
+using Telemetry_Device.Services.Networking;
 using Telemetry_Device.Services.TplDataflowBlocks;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -25,6 +27,7 @@ builder.Services.AddSingleton<IDecoderBlock>(serviceProvider =>
 
 builder.Services.AddSingleton<IBuilderBlock, BuilderBlock>();
 builder.Services.AddSingleton<PacketPipelineService>();
+builder.Services.AddSingleton<IUdpChecksumCalculator, UdpChecksumCalculator>();
 
 
 WebApplication app = builder.Build();
