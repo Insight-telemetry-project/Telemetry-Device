@@ -1,7 +1,10 @@
-﻿using System.Threading.Tasks.Dataflow;
+using System.Text.Json;
+using System.Threading.Tasks.Dataflow;
+using Telemetry_Device.Models.Interface.Kafka;
 using Telemetry_Device.Models.Interface.TplBlocks;
 using Telemetry_Device.Models.Interface.TplDataflowBlocks;
 using Telemetry_Device.Models.Packets;
+using Telemetry_Device.Services.Kafka;
 
 namespace Telemetry_Device.Services.TplDataflowBlocks
 {
@@ -9,11 +12,13 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
     {
         private readonly IBuilderBlock _builderBlock;
         private readonly IDecoderBlock _decoderBlock;
+        private readonly IKafkaSendMessage _kafkaSendMessage;
 
-        public PacketPipelineService(IBuilderBlock builderBlock, IDecoderBlock decoderBlock)
+        public PacketPipelineService(IBuilderBlock builderBlock, IDecoderBlock decoderBlock, IKafkaSendMessage kafkaSendMessage)
         {
             _builderBlock = builderBlock;
             _decoderBlock = decoderBlock;
+            _kafkaSendMessage = kafkaSendMessage;
         }
 
         public async IAsyncEnumerable<DecodedFieldsPacket> RunPipelineStreamAsync(string pcapFilePath)

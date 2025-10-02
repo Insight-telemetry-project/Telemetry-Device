@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -50,8 +50,20 @@ namespace Telemetry_Device.Controllers
                 yield return packet;
             }
             System.IO.File.Delete(tempFilePath);
+        [HttpGet("test-kafka")]
+        public async Task<IActionResult> TestKafka()
+        {
+            var kafka = new Services.Kafka.KafkaSendMessage("localhost:9092");
+
+            await kafka.SendMessageAsync("test-topic", "Hello from Telemetry_Device!");
+
+            return Ok("Kafka test message sent");
         }
+
+
+
     }
+
 }
 
 
