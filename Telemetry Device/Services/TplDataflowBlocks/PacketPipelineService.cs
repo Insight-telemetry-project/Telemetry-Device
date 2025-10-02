@@ -12,38 +12,33 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
     {
         private readonly IBuilderBlock _builderBlock;
         private readonly IDecoderBlock _decoderBlock;
-        private readonly IKafkaSendMessage _kafkaSendMessage;
+        private readonly KafkaProducerBlock _kafkaProducerBlock;
 
-        public PacketPipelineService(IBuilderBlock builderBlock, IDecoderBlock decoderBlock, IKafkaSendMessage kafkaSendMessage)
+        public PacketPipelineService(
+            IBuilderBlock builderBlock,
+            IDecoderBlock decoderBlock,
+            KafkaProducerBlock kafkaProducerBlock)
         {
             _builderBlock = builderBlock;
             _decoderBlock = decoderBlock;
-            _kafkaSendMessage = kafkaSendMessage;
+            _kafkaProducerBlock = kafkaProducerBlock;
         }
 
-        public async Task RunAsync(string filePath)
+        public async Task StartPipelineAsync(string filePath)
         {
             BufferBlock<PacketData> builder = _builderBlock.CreateBuilderBlock(filePath);
             TransformBlock<PacketData, DictionaryPacket> decoder = _decoderBlock.CreateDecoderBlock();
 
-            // builder -> decoder
             builder.LinkTo(decoder, new DataflowLinkOptions { PropagateCompletion = true });
 
-            // decoder -> kafka
-            ActionBlock<DictionaryPacket> kafkaBlock = new ActionBlock<DictionaryPacket>(async decoded =>
-            {
-                string json = JsonSerializer.Serialize(decoded);
-                await _kafkaSendMessage.SendMessageAsync("test-topic", json);
-            });
+            TransformBlock<DictionaryPacket, string> serializeBlock =
+                new TransformBlock<DictionaryPacket, string>(decoded => JsonSerializer.Serialize(decoded));
 
-            decoder.LinkTo(kafkaBlock, new DataflowLinkOptions { PropagateCompletion = true });
+            decoder.LinkTo(serializeBlock, new DataflowLinkOptions { PropagateCompletion = true });
+            serializeBlock.LinkTo(_kafkaProducerBlock.KafkaBlock, new DataflowLinkOptions { PropagateCompletion = true });
 
-            await kafkaBlock.Completion;
+            await _kafkaProducerBlock.KafkaBlock.Completion;
         }
-
-
-
-
-
     }
+
 }

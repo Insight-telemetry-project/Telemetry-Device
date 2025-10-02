@@ -10,7 +10,7 @@ namespace SendRecieveUDP.Service.BitManipulation
             for (int indexInByte = 0; indexInByte < bitCount; indexInByte++)
             {
                 int byteIndex = (bitOffset + indexInByte) / ConstantBits.BITS_IN_BYTE;
-                int bitIndex = ConstantBits.MAX_BIT_INDEX_IN_BYTE - ((bitOffset + indexInByte) % ConstantBits.BITS_IN_BYTE);
+                int bitIndex = ConstantBits.BITS_IN_BYTE - 1 - ((bitOffset + indexInByte) % ConstantBits.BITS_IN_BYTE);
 
                 int bitValue = (int)((value >> (bitCount - ConstantBits.SINGLE_BIT_VALUE - indexInByte)) & ConstantBits.SINGLE_BIT_VALUE);
 
@@ -27,7 +27,7 @@ namespace SendRecieveUDP.Service.BitManipulation
             for (int indexInByte = 0; indexInByte < bitCount; indexInByte++)
             {
                 int byteIndex = (bitOffset + indexInByte) / ConstantBits.BITS_IN_BYTE;
-                int bitIndex = ConstantBits.MAX_BIT_INDEX_IN_BYTE - ((bitOffset + indexInByte) % ConstantBits.BITS_IN_BYTE);
+                int bitIndex = ConstantBits.BITS_IN_BYTE - 1 - ((bitOffset + indexInByte) % ConstantBits.BITS_IN_BYTE);
 
                 int bit = (buffer[byteIndex] >> bitIndex) & ConstantBits.SINGLE_BIT_VALUE;
                 value = (value << ConstantBits.SINGLE_BIT_VALUE) | (ulong)bit; 

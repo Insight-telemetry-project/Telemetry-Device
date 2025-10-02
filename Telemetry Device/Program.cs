@@ -2,6 +2,7 @@ using SendRecieveUDP.Model.Constant;
 using SendRecieveUDP.Model.Interfaces.BitManipulation;
 using SendRecieveUDP.Service.BitManipulation;
 using System.Text.Json;
+using Telemetry_Device.Models.Constant;
 using Telemetry_Device.Models.Interface;
 using Telemetry_Device.Models.Interface.Kafka;
 using Telemetry_Device.Models.Interface.Networking;
@@ -31,9 +32,14 @@ builder.Services.AddSingleton<IDecoderBlock>(serviceProvider =>
 builder.Services.AddSingleton<IBuilderBlock, BuilderBlock>();
 builder.Services.AddSingleton<PacketPipelineService>();
 builder.Services.AddSingleton<IUdpChecksumCalculator, UdpChecksumCalculator>();
-builder.Services.AddSingleton<IKafkaSendMessage>(sp =>
-    new KafkaSendMessage(ConstantNetwork.KAFKA_ADDRESS));
+builder.Services.AddSingleton<IKafkaSendMessage>(serviceProvider =>
+    new KafkaSendMessage(ConstantKafka.KAFKA_ADDRESS));
 
+builder.Services.AddSingleton<KafkaProducerBlock>(serviceProvider =>
+{
+    var kafkaService = serviceProvider.GetRequiredService<IKafkaSendMessage>();
+    return new KafkaProducerBlock(kafkaService, ConstantKafka.TOPIC_NAME);
+});
 
 
 

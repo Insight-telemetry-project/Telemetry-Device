@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Telemetry_Device.Models;
 using Telemetry_Device.Models.Interface;
+using Telemetry_Device.Models.Interface.Kafka;
 using Telemetry_Device.Models.Packets;
 using Telemetry_Device.Services.TplDataflowBlocks;
 
@@ -16,11 +17,14 @@ namespace Telemetry_Device.Controllers
     public class PacketsController : ControllerBase
     {
         private readonly PacketPipelineService _pipeline;
+        private readonly IKafkaSendMessage _kafka;
 
-        public PacketsController(PacketPipelineService pipeline)
+        public PacketsController(PacketPipelineService pipeline, IKafkaSendMessage kafka)
         {
             _pipeline = pipeline;
+            _kafka = kafka;
         }
+
 
         [HttpGet("decode-local")]
         public async Task<IActionResult> DecodeLocal([FromQuery] string fileName)
@@ -30,7 +34,7 @@ namespace Telemetry_Device.Controllers
             if (!System.IO.File.Exists(fullPath))
                 return NotFound($"File not found: {fullPath}");
 
-            await _pipeline.RunAsync(fullPath);
+            await _pipeline.StartPipelineAsync(fullPath);
 
             return Ok("Packets sent to Kafka");
         }
@@ -41,12 +45,10 @@ namespace Telemetry_Device.Controllers
         [HttpGet("test-kafka")]
         public async Task<IActionResult> TestKafka()
         {
-            var kafka = new Services.Kafka.KafkaSendMessage("localhost:9092");
-
-            await kafka.SendMessageAsync("test-topic", "Hello from Telemetry_Device!");
-
+            await _kafka.SendMessageAsync("test-topic", "Hello from Telemetry_Device!");
             return Ok("Kafka test message sent");
         }
+
 
 
 

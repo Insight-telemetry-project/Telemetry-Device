@@ -7,7 +7,6 @@
 
         public ushort ChecksumPacket { get; set; }
 
-        //public ushort ChecksumComputed { get; set; }
     }
 }
 

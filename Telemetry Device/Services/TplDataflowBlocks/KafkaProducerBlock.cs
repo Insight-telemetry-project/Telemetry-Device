@@ -1,5 +1,6 @@
 ﻿using Confluent.Kafka;
 using System.Threading.Tasks.Dataflow;
+using Telemetry_Device.Models.Interface.Kafka;
 using Telemetry_Device.Services.Kafka;
 
 namespace Telemetry_Device.Services.TplDataflowBlocks
@@ -8,7 +9,7 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
     {
         private readonly ActionBlock<string> _block;
 
-        public KafkaProducerBlock(KafkaSendMessage kafka, string topic)
+        public KafkaProducerBlock(IKafkaSendMessage kafka, string topic)
         {
             _block = new ActionBlock<string>(async message =>
             {
@@ -16,6 +17,8 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
             });
         }
 
-        public ITargetBlock<string> Block => _block;
+        public ITargetBlock<string> KafkaBlock => _block;
     }
+
+
 }
