@@ -25,19 +25,31 @@ namespace Telemetry_Device.Controllers
         [HttpGet("decode-local")]
         public async Task<IActionResult> DecodeLocal([FromQuery] string fileName)
         {
-            if (string.IsNullOrWhiteSpace(fileName))
-                return BadRequest("fileName is required");
-
-
-            string fullPath = Path.Combine( "Data", fileName);
-
+            string fullPath = Path.Combine("Data", fileName);
 
             if (!System.IO.File.Exists(fullPath))
                 return NotFound($"File not found: {fullPath}");
 
-            List<DictionaryPacket> decodedList = await _pipeline.RunAsync(fullPath);
+            await _pipeline.RunAsync(fullPath);
 
-            return Ok(decodedList);
+            return Ok("Packets sent to Kafka");
         }
+
+
+
+
+        [HttpGet("test-kafka")]
+        public async Task<IActionResult> TestKafka()
+        {
+            var kafka = new Services.Kafka.KafkaSendMessage("localhost:9092");
+
+            await kafka.SendMessageAsync("test-topic", "Hello from Telemetry_Device!");
+
+            return Ok("Kafka test message sent");
+        }
+
+
+
     }
+
 }
