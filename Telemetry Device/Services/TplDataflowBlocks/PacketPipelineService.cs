@@ -12,13 +12,16 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
     {
         private readonly IBuilderBlock _builderBlock;
         private readonly IDecoderBlock _decoderBlock;
-        private readonly IKafkaSendMessage _kafkaSendMessage;
+        private readonly KafkaProducerBlock _kafkaProducerBlock;
 
-        public PacketPipelineService(IBuilderBlock builderBlock, IDecoderBlock decoderBlock, IKafkaSendMessage kafkaSendMessage)
+        public PacketPipelineService(
+            IBuilderBlock builderBlock,
+            IDecoderBlock decoderBlock,
+            KafkaProducerBlock kafkaProducerBlock)
         {
             _builderBlock = builderBlock;
             _decoderBlock = decoderBlock;
-            _kafkaSendMessage = kafkaSendMessage;
+            _kafkaProducerBlock = kafkaProducerBlock;
         }
 
         public async IAsyncEnumerable<DecodedFieldsPacket> RunPipelineStreamAsync(string pcapFilePath)
@@ -45,4 +48,5 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
             });
         }
     }
+
 }

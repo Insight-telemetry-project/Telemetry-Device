@@ -1,4 +1,4 @@
-﻿using SendRecieveUDP.Model.Constant;
+using SendRecieveUDP.Model.Constant;
 using SendRecieveUDP.Model.Interfaces.BitManipulation;
 namespace SendRecieveUDP.Service.BitManipulation
 {

@@ -1,4 +1,4 @@
-﻿namespace Telemetry_Device.Models.Packets
+namespace Telemetry_Device.Models.Packets
 {
     public class PacketData
     {
