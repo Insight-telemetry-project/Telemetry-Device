@@ -1,9 +1,10 @@
 using SendRecieveUDP.Model.Interfaces.BitManipulation;
 using SendRecieveUDP.Service.BitManipulation;
 using System.Text.Json;
-using Telemetry_Device.Models.Interface;
+using Telemetry_Device.Models.Interface.Icd;
 using Telemetry_Device.Models.Interface.TplBlocks;
 using Telemetry_Device.Models.Interface.TplDataflowBlocks;
+using Telemetry_Device.Services.Icd;
 using Telemetry_Device.Services.TplDataflowBlocks;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -13,16 +14,8 @@ builder.Services.AddOpenApi();
 
 
 builder.Services.AddSingleton<IBitEncoder, BitEncoder>();
-builder.Services.AddSingleton<IDecoderBlock>(serviceProvider =>
-{
-    IBitEncoder bitEncoder = serviceProvider.GetRequiredService<IBitEncoder>();
-
-    string icdJson = File.ReadAllText("Data/icd.json");
-    List<IcdField> icd = JsonSerializer.Deserialize<List<IcdField>>(icdJson)!;
-
-    return new DecoderBlock(bitEncoder, icd);
-});
-
+builder.Services.AddSingleton<IIcdProvider, IcdFileProvider>();
+builder.Services.AddSingleton<IDecoderBlock, DecoderBlock>();
 builder.Services.AddSingleton<IBuilderBlock, BuilderBlock>();
 builder.Services.AddSingleton<PacketPipelineService>();
 

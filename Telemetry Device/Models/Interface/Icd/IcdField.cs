@@ -1,4 +1,4 @@
-﻿namespace Telemetry_Device.Models.Interface
+﻿namespace Telemetry_Device.Models.Interface.Icd
 {
     public class IcdField
     {

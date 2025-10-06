@@ -1,20 +1,21 @@
 ﻿using SendRecieveUDP.Model.Interfaces.BitManipulation;
 using System.Threading.Tasks.Dataflow;
-using Telemetry_Device.Models.Interface;
 using Telemetry_Device.Models.Packets;
 using Telemetry_Device.Models.Constant;
 using Telemetry_Device.Models.Interface.TplDataflowBlocks;
+using Telemetry_Device.Models.Interface.Icd;
 
 public class DecoderBlock : IDecoderBlock
 {
     private readonly IBitEncoder _bitEncoder;
+    private readonly IIcdProvider _icdProvider;
     private readonly List<IcdField> _icd;
 
-
-    public DecoderBlock(IBitEncoder bitEncoder, List<IcdField> icd)
+    public DecoderBlock(IBitEncoder bitEncoder, IIcdProvider icdProvider)
     {
         _bitEncoder = bitEncoder;
-        _icd = icd;
+        _icdProvider = icdProvider;
+        _icd = _icdProvider.LoadIcd();
     }
 
     public TransformBlock<PacketData, DictionaryPacket> CreateDecoderBlock()
