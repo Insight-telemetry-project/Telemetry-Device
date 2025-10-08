@@ -6,7 +6,8 @@ namespace Telemetry_Device.Models.Interface.TplBlocks
 {
     public interface IBuilderBlock
     {
-        BufferBlock<PacketData> CreateBuilderBlock(string filePath);
+        ITargetBlock<string> Input { get; }
+        ISourceBlock<PacketData> Output { get; }
 
         PacketData ReadSinglePacket(BinaryReader reader);
 

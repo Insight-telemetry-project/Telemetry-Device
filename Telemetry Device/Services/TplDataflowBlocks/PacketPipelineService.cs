@@ -18,14 +18,18 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
 
         public async Task<List<DictionaryPacket>> RunAsync(string filePath)
         {
-            BufferBlock<PacketData> builder = _builderBlock.CreateBuilderBlock(filePath);
-            TransformBlock<PacketData, DictionaryPacket> decoder = _decoderBlock.CreateDecoderBlock();
-
             List<DictionaryPacket> results = new List<DictionaryPacket>();
-            ActionBlock<DictionaryPacket> collectBlock = new ActionBlock<DictionaryPacket>(decoded => results.Add(decoded));
 
-            builder.LinkTo(decoder, new DataflowLinkOptions { PropagateCompletion = true });
-            decoder.LinkTo(collectBlock, new DataflowLinkOptions { PropagateCompletion = true });
+            ActionBlock<DictionaryPacket> collectBlock = new ActionBlock<DictionaryPacket>(decoded =>
+            {
+                results.Add(decoded);
+            });
+
+            _builderBlock.Output.LinkTo(_decoderBlock.Input, new DataflowLinkOptions { PropagateCompletion = true });
+            _decoderBlock.Output.LinkTo(collectBlock, new DataflowLinkOptions { PropagateCompletion = true });
+
+            await _builderBlock.Input.SendAsync(filePath);
+            _builderBlock.Input.Complete();
 
             await collectBlock.Completion;
 

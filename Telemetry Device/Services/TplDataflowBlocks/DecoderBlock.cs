@@ -1,4 +1,5 @@
 ﻿using SendRecieveUDP.Model.Interfaces.BitManipulation;
+using System.Collections.Generic;
 using System.Threading.Tasks.Dataflow;
 using Telemetry_Device.Models.Packets;
 using Telemetry_Device.Models.Constant;
@@ -10,17 +11,15 @@ public class DecoderBlock : IDecoderBlock
     private readonly IBitEncoder _bitEncoder;
     private readonly IIcdProvider _icdProvider;
     private readonly List<IcdField> _icd;
+    private readonly TransformBlock<PacketData, DictionaryPacket> _transformBlock;
 
     public DecoderBlock(IBitEncoder bitEncoder, IIcdProvider icdProvider)
     {
         _bitEncoder = bitEncoder;
         _icdProvider = icdProvider;
         _icd = _icdProvider.LoadIcd();
-    }
 
-    public TransformBlock<PacketData, DictionaryPacket> CreateDecoderBlock()
-    {
-        return new TransformBlock<PacketData, DictionaryPacket>(packet =>
+        _transformBlock = new TransformBlock<PacketData, DictionaryPacket>(packet =>
         {
             DictionaryPacket decodedPacket = new DictionaryPacket();
 
@@ -29,10 +28,13 @@ public class DecoderBlock : IDecoderBlock
                 decodedPacket.Fields[icdField.Name] = DecodeField(packet, icdField);
             }
 
-
             return decodedPacket;
         });
     }
+
+    public ITargetBlock<PacketData> Input => _transformBlock;
+    public ISourceBlock<DictionaryPacket> Output => _transformBlock;
+
     public double DecodeField(PacketData packet, IcdField icdField)
     {
         int absoluteOffset = ConstantPackets.HEADER_BIT_OFFSET + icdField.BitOffset;

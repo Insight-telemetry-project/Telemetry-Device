@@ -7,7 +7,10 @@ namespace Telemetry_Device.Models.Interface.TplDataflowBlocks
     public interface IDecoderBlock
     {
         double DecodeField(PacketData packet, IcdField icdField);
+        ITargetBlock<PacketData> Input { get; }
+        ISourceBlock<DictionaryPacket> Output { get; }
 
-        TransformBlock<PacketData, DictionaryPacket> CreateDecoderBlock();
+       
+
     }
 }

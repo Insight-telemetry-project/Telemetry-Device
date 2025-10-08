@@ -1,6 +1,7 @@
 ﻿using SendRecieveUDP.Model.Constant;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks.Dataflow;
 using Telemetry_Device.Models.Constant;
 using Telemetry_Device.Models.Interface.TplBlocks;
@@ -10,12 +11,14 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
 {
     public class BuilderBlock : IBuilderBlock
     {
-        public BufferBlock<PacketData> CreateBuilderBlock(string filePath)
-        {
-            BufferBlock<PacketData> buffer = new BufferBlock<PacketData>();
+        private readonly TransformManyBlock<string, PacketData> _transformBlock;
 
-            Task.Run(() =>
+        public BuilderBlock()
+        {
+            _transformBlock = new TransformManyBlock<string, PacketData>(filePath =>
             {
+                List<PacketData> packets = new List<PacketData>();
+
                 using FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
                 using BinaryReader binaryReader = new BinaryReader(fileStream);
 
@@ -24,14 +27,15 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
                 while (binaryReader.BaseStream.Position < binaryReader.BaseStream.Length)
                 {
                     PacketData packet = ReadSinglePacket(binaryReader);
-                    buffer.Post(packet); 
+                    packets.Add(packet);
                 }
 
-                buffer.Complete();
+                return packets;
             });
-
-            return buffer;
         }
+
+        public ITargetBlock<string> Input => _transformBlock;
+        public ISourceBlock<PacketData> Output => _transformBlock;
 
         public PacketData ReadSinglePacket(BinaryReader reader)
         {
