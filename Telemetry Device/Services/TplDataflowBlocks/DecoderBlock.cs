@@ -8,38 +8,34 @@ using Telemetry_Device.Models.Interface.Icd;
 
 public class DecoderBlock : IDecoderBlock
 {
-    private readonly IBitEncoder _bitEncoder;
+    private readonly IBitOperations _bitOperations;
     private readonly IIcdProvider _icdProvider;
     private readonly List<IcdField> _icd;
     private readonly TransformBlock<PacketData, DictionaryPacket> _transformBlock;
 
-    public DecoderBlock(IBitEncoder bitEncoder, IIcdProvider icdProvider)
+    public DecoderBlock(IBitOperations bitOperations, IIcdProvider icdProvider)
     {
-        _bitEncoder = bitEncoder;
+        _bitOperations = bitOperations;
         _icdProvider = icdProvider;
         _icd = _icdProvider.LoadIcd();
-
         _transformBlock = new TransformBlock<PacketData, DictionaryPacket>(packet =>
         {
-            DictionaryPacket decodedPacket = new DictionaryPacket();
-
-            foreach (IcdField icdField in _icd)
-            {
-                decodedPacket.Fields[icdField.Name] = DecodeField(packet, icdField);
-            }
-
-            return decodedPacket;
+            Dictionary<string, double> fields = _icd
+                .AsParallel()
+                .ToDictionary(
+                    IcdField => IcdField.Name,
+                    icdField => DecodeFieldValue(packet, icdField)
+                );
+            return new DictionaryPacket(fields);
         });
     }
-
     public ITargetBlock<PacketData> Input => _transformBlock;
     public ISourceBlock<DictionaryPacket> Output => _transformBlock;
 
-    public double DecodeField(PacketData packet, IcdField icdField)
+    public double DecodeFieldValue(PacketData packet, IcdField icdField)
     {
         int absoluteOffset = ConstantPackets.HEADER_BIT_OFFSET + icdField.BitOffset;
-        ulong rawValue = _bitEncoder.ReadBits(packet.PayloadPacket, absoluteOffset, icdField.SizeBits);
+        ulong rawValue = _bitOperations.ReadBits(packet.Payload, absoluteOffset, icdField.SizeBits);
         return rawValue * icdField.Scale + icdField.Min;
     }
-
 }

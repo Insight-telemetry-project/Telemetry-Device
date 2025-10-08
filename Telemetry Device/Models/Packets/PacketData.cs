@@ -2,12 +2,8 @@
 {
     public class PacketData
     {
-
-        public byte[] PayloadPacket { get; set; }
-
-        public ushort ChecksumPacket { get; set; }
-
-        //public ushort ChecksumComputed { get; set; }
+        public byte[] Payload { get; set; }
+        public ushort Checksum { get; set; }
     }
 }
 

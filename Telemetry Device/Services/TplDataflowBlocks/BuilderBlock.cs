@@ -15,11 +15,11 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
 
         public BuilderBlock()
         {
-            _transformBlock = new TransformManyBlock<string, PacketData>(filePath =>
+            _transformBlock = new TransformManyBlock<string, PacketData>(pcapFilePath =>
             {
                 List<PacketData> packets = new List<PacketData>();
 
-                using FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+                using FileStream fileStream = new FileStream(pcapFilePath, FileMode.Open, FileAccess.Read);
                 using BinaryReader binaryReader = new BinaryReader(fileStream);
 
                 binaryReader.ReadBytes(ConstantPackets.GLOBAL_HEADER_SIZE);
@@ -39,10 +39,10 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
 
         public PacketData ReadSinglePacket(BinaryReader reader)
         {
-            _ = reader.ReadUInt32(); // timestampSeconds
-            _ = reader.ReadUInt32(); // timestampMicroseconds
+            _ = reader.ReadUInt32();
+            _ = reader.ReadUInt32();
             uint includedLength = reader.ReadUInt32();
-            _ = reader.ReadUInt32(); // originalLength
+            _ = reader.ReadUInt32();
 
             byte[] payload = reader.ReadBytes((int)includedLength);
 
@@ -53,8 +53,8 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
 
             return new PacketData
             {
-                PayloadPacket = payload,
-                ChecksumPacket = checksum
+                Payload = payload,
+                Checksum = checksum
             };
         }
     }

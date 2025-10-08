@@ -16,24 +16,28 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
             _decoderBlock = decoderBlock;
         }
 
-        public async Task<List<DictionaryPacket>> RunAsync(string filePath)
+        public async IAsyncEnumerable<DictionaryPacket> RunPipelineStreamAsync(string pcapFilePath)
         {
-            List<DictionaryPacket> results = new List<DictionaryPacket>();
+            LinkBlocks(_builderBlock.Output, _decoderBlock.Input);
 
-            ActionBlock<DictionaryPacket> collectBlock = new ActionBlock<DictionaryPacket>(decoded =>
-            {
-                results.Add(decoded);
-            });
-
-            _builderBlock.Output.LinkTo(_decoderBlock.Input, new DataflowLinkOptions { PropagateCompletion = true });
-            _decoderBlock.Output.LinkTo(collectBlock, new DataflowLinkOptions { PropagateCompletion = true });
-
-            await _builderBlock.Input.SendAsync(filePath);
+            await _builderBlock.Input.SendAsync(pcapFilePath);
             _builderBlock.Input.Complete();
 
-            await collectBlock.Completion;
+            while (await _decoderBlock.Output.OutputAvailableAsync())
+            {
+                DictionaryPacket decodedPacket = await _decoderBlock.Output.ReceiveAsync();
+                yield return decodedPacket;
+            }
 
-            return results;
+            await _decoderBlock.Output.Completion;
+        }
+        private void LinkBlocks(ISourceBlock<PacketData> builderOutput,
+                                ITargetBlock<PacketData> decoderInput)
+        {
+            builderOutput.LinkTo(decoderInput, new DataflowLinkOptions
+            {
+                PropagateCompletion = true
+            });
         }
     }
 }
