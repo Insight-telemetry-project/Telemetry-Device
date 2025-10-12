@@ -1,0 +1,273 @@
+﻿[
+	{
+		"Name": "volt1",
+		"Units": "V",
+		"BitOffset": 0,
+		"SizeBits": 9,
+		"Scale": 0.1,
+		"Min": 0,
+		"Max": 50
+	},
+	{
+		"Name": "volt2",
+		"Units": "V",
+		"BitOffset": 9,
+		"SizeBits": 9,
+		"Scale": 0.1,
+		"Min": 0,
+		"Max": 50
+	},
+	{
+		"Name": "amp1",
+		"Units": "A",
+		"BitOffset": 18,
+		"SizeBits": 10,
+		"Scale": 0.1,
+		"Min": -50,
+		"Max": 50
+	},
+	{
+		"Name": "amp2",
+		"Units": "A",
+		"BitOffset": 28,
+		"SizeBits": 10,
+		"Scale": 0.1,
+		"Min": -50,
+		"Max": 50
+	},
+
+	{
+		"Name": "FQtyL",
+		"Units": "kg",
+		"BitOffset": 38,
+		"SizeBits": 14,
+		"Scale": 0.01,
+		"Min": 0,
+		"Max": 100
+	},
+	{
+		"Name": "FQtyR",
+		"Units": "kg",
+		"BitOffset": 52,
+		"SizeBits": 14,
+		"Scale": 0.01,
+		"Min": 0,
+		"Max": 100
+	},
+	{
+		"Name": "E1 FFlow",
+		"Units": "kg/h",
+		"BitOffset": 66,
+		"SizeBits": 14,
+		"Scale": 0.01,
+		"Min": 0,
+		"Max": 100
+	},
+
+	{
+		"Name": "E1 OilT",
+		"Units": "C",
+		"BitOffset": 80,
+		"SizeBits": 16,
+		"Scale": 0.01,
+		"Min": 0,
+		"Max": 500
+	},
+	{
+		"Name": "E1 OilP",
+		"Units": "psi",
+		"BitOffset": 96,
+		"SizeBits": 16,
+		"Scale": 0.01,
+		"Min": 0,
+		"Max": 500
+	},
+
+	{
+		"Name": "E1 RPM",
+		"Units": "rpm",
+		"BitOffset": 112,
+		"SizeBits": 14,
+		"Scale": 1.0,
+		"Min": 0,
+		"Max": 10000
+	},
+
+	{
+		"Name": "E1 CHT1",
+		"Units": "C",
+		"BitOffset": 126,
+		"SizeBits": 13,
+		"Scale": 0.1,
+		"Min": 0,
+		"Max": 800
+	},
+	{
+		"Name": "E1 CHT2",
+		"Units": "C",
+		"BitOffset": 139,
+		"SizeBits": 13,
+		"Scale": 0.1,
+		"Min": 0,
+		"Max": 800
+	},
+	{
+		"Name": "E1 CHT3",
+		"Units": "C",
+		"BitOffset": 152,
+		"SizeBits": 13,
+		"Scale": 0.1,
+		"Min": 0,
+		"Max": 800
+	},
+	{
+		"Name": "E1 CHT4",
+		"Units": "C",
+		"BitOffset": 165,
+		"SizeBits": 13,
+		"Scale": 0.1,
+		"Min": 0,
+		"Max": 800
+	},
+
+	{
+		"Name": "E1 EGT1",
+		"Units": "C",
+		"BitOffset": 178,
+		"SizeBits": 16,
+		"Scale": 0.1,
+		"Min": 0,
+		"Max": 4000
+	},
+	{
+		"Name": "E1 EGT2",
+		"Units": "C",
+		"BitOffset": 194,
+		"SizeBits": 16,
+		"Scale": 0.1,
+		"Min": 0,
+		"Max": 4000
+	},
+	{
+		"Name": "E1 EGT3",
+		"Units": "C",
+		"BitOffset": 210,
+		"SizeBits": 16,
+		"Scale": 0.1,
+		"Min": 0,
+		"Max": 4000
+	},
+	{
+		"Name": "E1 EGT4",
+		"Units": "C",
+		"BitOffset": 226,
+		"SizeBits": 16,
+		"Scale": 0.1,
+		"Min": 0,
+		"Max": 4000
+	},
+
+	{
+		"Name": "OAT",
+		"Units": "C",
+		"BitOffset": 242,
+		"SizeBits": 11,
+		"Scale": 0.1,
+		"Min": -80,
+		"Max": 80
+	},
+	{
+		"Name": "IAS",
+		"Units": "kt",
+		"BitOffset": 253,
+		"SizeBits": 16,
+		"Scale": 0.01,
+		"Min": 0,
+		"Max": 500
+	},
+
+	{
+		"Name": "VSpd",
+		"Units": "ft/min",
+		"BitOffset": 269,
+		"SizeBits": 14,
+		"Scale": 1.0,
+		"Min": -5000,
+		"Max": 5000
+	},
+	{
+		"Name": "NormAc",
+		"Units": "g",
+		"BitOffset": 283,
+		"SizeBits": 12,
+		"Scale": 0.01,
+		"Min": -20,
+		"Max": 20
+	},
+
+	{
+		"Name": "AltMSL",
+		"Units": "ft",
+		"BitOffset": 295,
+		"SizeBits": 16,
+		"Scale": 1.0,
+		"Min": 0,
+		"Max": 50000
+	},
+
+	{
+		"Name": "timestep",
+		"Units": "ticks",
+		"BitOffset": 311,
+		"SizeBits": 17,
+		"Scale": 1.0,
+		"Min": 0,
+		"Max": 100000
+	},
+	{
+		"Name": "cluster",
+		"Units": "id",
+		"BitOffset": 328,
+		"SizeBits": 7,
+		"Scale": 1.0,
+		"Min": 0,
+		"Max": 100
+	},
+	{
+		"Name": "Master Index",
+		"Units": "idx",
+		"BitOffset": 335,
+		"SizeBits": 17,
+		"Scale": 1.0,
+		"Min": 0,
+		"Max": 100000
+	},
+
+	{
+		"Name": "date_diff",
+		"Units": "days",
+		"BitOffset": 352,
+		"SizeBits": 10,
+		"Scale": 1.0,
+		"Min": 0,
+		"Max": 1000
+	},
+	{
+		"Name": "flight_length",
+		"Units": "min",
+		"BitOffset": 362,
+		"SizeBits": 17,
+		"Scale": 1.0,
+		"Min": 0,
+		"Max": 100000
+	},
+	{
+		"Name": "number_flights_before",
+		"Units": "cnt",
+		"BitOffset": 379,
+		"SizeBits": 8,
+		"Scale": 1.0,
+		"Min": -100,
+		"Max": 100
+	}
+]
