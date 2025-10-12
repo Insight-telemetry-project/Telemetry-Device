@@ -67,6 +67,3 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
     }
 
 }
-
-
-

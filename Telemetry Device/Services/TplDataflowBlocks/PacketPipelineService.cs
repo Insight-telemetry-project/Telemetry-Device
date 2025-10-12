@@ -4,6 +4,7 @@ using Telemetry_Device.Models.Interface.Kafka;
 using Telemetry_Device.Models.Interface.TplBlocks;
 using Telemetry_Device.Models.Interface.TplDataflowBlocks;
 using Telemetry_Device.Models.Packets;
+using Telemetry_Device.Services.Kafka;
 
 namespace Telemetry_Device.Services.TplDataflowBlocks
 {
@@ -58,4 +59,5 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
 
 
     }
+
 }

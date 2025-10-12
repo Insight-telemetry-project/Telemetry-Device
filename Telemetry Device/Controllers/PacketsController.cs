@@ -50,3 +50,5 @@ namespace Telemetry_Device.Controllers
 }
 
 
+            return Ok("Packets sent to Kafka");
+        }
