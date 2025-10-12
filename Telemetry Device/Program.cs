@@ -1,11 +1,9 @@
 using SendRecieveUDP.Model.Constant;
 using SendRecieveUDP.Model.Interfaces.BitManipulation;
 using SendRecieveUDP.Service.BitManipulation;
-using System.Text.Json;
 using Telemetry_Device.Models.Constant;
 using Telemetry_Device.Models.Interface.Files;
 using Telemetry_Device.Models.Interface.Icd;
-using Telemetry_Device.Models.Interface;
 using Telemetry_Device.Models.Interface.Kafka;
 using Telemetry_Device.Models.Interface.Networking;
 using Telemetry_Device.Models.Interface.TplBlocks;
@@ -13,7 +11,6 @@ using Telemetry_Device.Models.Interface.TplDataflowBlocks;
 using Telemetry_Device.Services.Kafka;
 using Telemetry_Device.Services.Files;
 using Telemetry_Device.Services.Icd;
-using Telemetry_Device.Services.Networking;
 using Telemetry_Device.Services.Networking;
 using Telemetry_Device.Services.TplDataflowBlocks;
 

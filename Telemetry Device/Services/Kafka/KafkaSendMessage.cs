@@ -28,9 +28,9 @@ namespace Telemetry_Device.Services.Kafka
 
                 Debug.WriteLine($"Delivered '{delivery.Value}' to {delivery.TopicPartitionOffset}");
             }
-            catch (ProduceException<Null, string> e)
+            catch (ProduceException<Null, string> exception)
             {
-                Debug.WriteLine($"Delivery failed: {e.Error.Reason}");
+                Debug.WriteLine($"Delivery failed: {exception.Error.Reason}");
 
             }
         }
