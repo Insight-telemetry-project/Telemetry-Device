@@ -26,16 +26,32 @@ namespace Telemetry_Device.Controllers
         }
 
         [HttpGet("decode-stream")]
-        public async IAsyncEnumerable<DictionaryPacket> DecodeStream([FromQuery, Required] string pcapFileName)
+        public async IAsyncEnumerable<DecodedFieldsPacket> DecodeStream([FromQuery, Required] string pcapFileName)
         {
             string pcapFilePath = _fileOperations.GetFullPath(pcapFileName);
             if (!_fileOperations.FileExists(pcapFileName))
                 yield break;
-            await foreach (DictionaryPacket packet in _pipeline.RunPipelineStreamAsync(pcapFilePath))
+            await foreach (DecodedFieldsPacket packet in _pipeline.RunPipelineStreamAsync(pcapFilePath))
             {
                 yield return packet; 
             }
         }
 
+        [HttpPost("decode-stream-file")]
+        public async IAsyncEnumerable<DecodedFieldsPacket> DecodeStream([FromForm, Required] IFormFile pcapFile)
+        {  
+            string tempFilePath = Path.Combine(Path.GetTempPath(), pcapFile.FileName);
+            using (FileStream stream = new FileStream(tempFilePath, FileMode.Create))
+            {
+                await pcapFile.CopyToAsync(stream);
+            }
+            await foreach (DecodedFieldsPacket packet in _pipeline.RunPipelineStreamAsync(tempFilePath))
+            {
+                yield return packet;
+            }
+            System.IO.File.Delete(tempFilePath);
+        }
     }
 }
+
+

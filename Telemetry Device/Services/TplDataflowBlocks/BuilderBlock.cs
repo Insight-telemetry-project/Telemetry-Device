@@ -17,22 +17,24 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
         {
             _transformBlock = new TransformManyBlock<string, PacketData>(pcapFilePath =>
             {
-                List<PacketData> packets = new List<PacketData>();
-
-                using FileStream fileStream = new FileStream(pcapFilePath, FileMode.Open, FileAccess.Read);
-                using BinaryReader binaryReader = new BinaryReader(fileStream);
-
-                binaryReader.ReadBytes(ConstantPackets.GLOBAL_HEADER_SIZE);
-
-                while (binaryReader.BaseStream.Position < binaryReader.BaseStream.Length)
-                {
-                    PacketData packet = ReadSinglePacket(binaryReader);
-                    packets.Add(packet);
-                }
-
-                return packets;
+                return ReadPackets(pcapFilePath);
             });
         }
+
+        private IEnumerable<PacketData> ReadPackets(string pcapFilePath)
+        {
+            using FileStream fileStream = new FileStream(pcapFilePath, FileMode.Open, FileAccess.Read);
+            using BinaryReader binaryReader = new BinaryReader(fileStream);
+
+            binaryReader.ReadBytes(ConstantPackets.GLOBAL_HEADER_SIZE);
+
+            while (binaryReader.BaseStream.Position < binaryReader.BaseStream.Length)
+            {
+                PacketData packet = ReadSinglePacket(binaryReader);
+                yield return packet;
+            }
+        }
+
 
         public ITargetBlock<string> Input => _transformBlock;
         public ISourceBlock<PacketData> Output => _transformBlock;

@@ -16,9 +16,11 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddSingleton<IBitOperations, BitOperations>();
 builder.Services.AddSingleton<IIcdProvider, IcdFileProvider>();
-builder.Services.AddSingleton<IDecoderBlock, DecoderBlock>();
-builder.Services.AddSingleton<IBuilderBlock, BuilderBlock>();
-builder.Services.AddSingleton<PacketPipelineService>();
+
+builder.Services.AddScoped<IBuilderBlock, BuilderBlock>();
+builder.Services.AddScoped<IDecoderBlock, DecoderBlock>();
+builder.Services.AddScoped<PacketPipelineService>();
+
 builder.Services.AddSingleton<IFileOperations, FileOperations>();
 
 WebApplication app = builder.Build();

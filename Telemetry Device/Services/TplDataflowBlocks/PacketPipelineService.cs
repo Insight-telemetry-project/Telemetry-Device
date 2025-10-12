@@ -16,7 +16,7 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
             _decoderBlock = decoderBlock;
         }
 
-        public async IAsyncEnumerable<DictionaryPacket> RunPipelineStreamAsync(string pcapFilePath)
+        public async IAsyncEnumerable<DecodedFieldsPacket> RunPipelineStreamAsync(string pcapFilePath)
         {
             LinkBlocks(_builderBlock.Output, _decoderBlock.Input);
 
@@ -25,7 +25,7 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
 
             while (await _decoderBlock.Output.OutputAvailableAsync())
             {
-                DictionaryPacket decodedPacket = await _decoderBlock.Output.ReceiveAsync();
+                DecodedFieldsPacket decodedPacket = await _decoderBlock.Output.ReceiveAsync();
                 yield return decodedPacket;
             }
 

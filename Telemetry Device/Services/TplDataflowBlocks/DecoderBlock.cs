@@ -11,14 +11,14 @@ public class DecoderBlock : IDecoderBlock
     private readonly IBitOperations _bitOperations;
     private readonly IIcdProvider _icdProvider;
     private readonly List<IcdField> _icd;
-    private readonly TransformBlock<PacketData, DictionaryPacket> _transformBlock;
+    private readonly TransformBlock<PacketData, DecodedFieldsPacket> _transformBlock;
 
     public DecoderBlock(IBitOperations bitOperations, IIcdProvider icdProvider)
     {
         _bitOperations = bitOperations;
         _icdProvider = icdProvider;
         _icd = _icdProvider.LoadIcd();
-        _transformBlock = new TransformBlock<PacketData, DictionaryPacket>(packet =>
+        _transformBlock = new TransformBlock<PacketData, DecodedFieldsPacket>(packet =>
         {
             Dictionary<string, double> fields = _icd
                 .AsParallel()
@@ -26,11 +26,11 @@ public class DecoderBlock : IDecoderBlock
                     IcdField => IcdField.Name,
                     icdField => DecodeFieldValue(packet, icdField)
                 );
-            return new DictionaryPacket(fields);
+            return new DecodedFieldsPacket(fields);
         });
     }
     public ITargetBlock<PacketData> Input => _transformBlock;
-    public ISourceBlock<DictionaryPacket> Output => _transformBlock;
+    public ISourceBlock<DecodedFieldsPacket> Output => _transformBlock;
 
     public double DecodeFieldValue(PacketData packet, IcdField icdField)
     {
