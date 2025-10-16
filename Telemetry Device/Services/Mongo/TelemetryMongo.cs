@@ -36,12 +36,6 @@ namespace Telemetry_Device.Services.Mongo
 
             fields.Remove(ConstantPackets.FLIGHT_ID);
 
-            Dictionary<string, int> integerFields = new Dictionary<string, int>();
-            foreach (KeyValuePair<string, int> field in fields)
-            {
-                integerFields[field.Key] = field.Value;
-            }
-
             TelemetryRecord telemetryRecord = new TelemetryRecord
             {
                 MasterIndex = masterIndex,
