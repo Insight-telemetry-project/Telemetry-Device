@@ -27,7 +27,6 @@ public class DecoderBlock : IDecoderBlock
 
         _transformBlock = new TransformBlock<PacketData, DecodedFieldsPacket>(ProcessPacketAsync);
 
-
     }
     public ITargetBlock<PacketData> Input => _transformBlock;
     public ISourceBlock<DecodedFieldsPacket> Output => _transformBlock;
@@ -66,7 +65,7 @@ public class DecoderBlock : IDecoderBlock
             return;
         }
 
-        if (_flightHeader.FlightHeader.Contains(name))
+        if (_flightHeader.Contains(name))
         {
             databaseFields[name] = (int)value;
             return;

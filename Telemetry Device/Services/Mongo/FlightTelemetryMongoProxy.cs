@@ -49,16 +49,17 @@ namespace Telemetry_Device.Services.Mongo
 
         private async Task EnsureIndexesCreatedAsync()
         {
-            if (_isIndexCreated)
-                return;
+            if (!_isIndexCreated)
+            {
+                CreateIndexModel<FlightTelemetryRecord> masterIndexModel = new CreateIndexModel<FlightTelemetryRecord>(
+                    Builders<FlightTelemetryRecord>.IndexKeys.Ascending(record => record.MasterIndex),
+                    new CreateIndexOptions { Unique = true });
 
-            var masterIndexModel = new CreateIndexModel<FlightTelemetryRecord>(
-                Builders<FlightTelemetryRecord>.IndexKeys.Ascending(record => record.MasterIndex),
-                new CreateIndexOptions { Unique = true });
-
-            await telemetryCollection.Indexes.CreateOneAsync(masterIndexModel);
-            _isIndexCreated = true;
+                await telemetryCollection.Indexes.CreateOneAsync(masterIndexModel);
+                _isIndexCreated = true;
+            }
         }
+
 
     }
 }
