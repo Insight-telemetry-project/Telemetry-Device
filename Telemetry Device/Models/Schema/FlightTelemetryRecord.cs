@@ -2,7 +2,7 @@
 
 namespace Telemetry_Device.Models.Schema
 {
-    public class TelemetryRecord
+    public class FlightTelemetryRecord
     {
         [BsonElement("Master Index")]
         public int MasterIndex { get; set; }

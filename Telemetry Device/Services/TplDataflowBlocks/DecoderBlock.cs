@@ -16,8 +16,8 @@ public class DecoderBlock : IDecoderBlock
     private readonly List<IcdField> _icd;
     private readonly TransformBlock<PacketData, DecodedFieldsPacket> _transformBlock;
     private readonly FlightHeaderSettings _flightHeader;
-    private readonly TelemetryMongo _telemetryMongo;
-    public DecoderBlock(IBitOperations bitOperations, IIcdProvider icdProvider, IOptions<FlightHeaderSettings> flightHeaderOptions, TelemetryMongo telemetryMongo)
+    private readonly FlightTelemetryMongoProxy _telemetryMongo;
+    public DecoderBlock(IBitOperations bitOperations, IIcdProvider icdProvider, IOptions<FlightHeaderSettings> flightHeaderOptions, FlightTelemetryMongoProxy telemetryMongo)
     {
         _bitOperations = bitOperations;
         _icdProvider = icdProvider;
@@ -25,43 +25,8 @@ public class DecoderBlock : IDecoderBlock
         _flightHeader = flightHeaderOptions.Value;
         _telemetryMongo = telemetryMongo;
 
-        //_transformBlock = new TransformBlock<PacketData, DecodedFieldsPacket>(packet =>
-        //{
-        //    Dictionary<string, double> fields = _icd
-        //        .AsParallel()
-        //        .ToDictionary(
-        //            IcdField => IcdField.Name,
-        //            icdField => DecodeFieldValue(packet, icdField)
-        //        );
-        //    return new DecodedFieldsPacket(fields);
-        //});
+        _transformBlock = new TransformBlock<PacketData, DecodedFieldsPacket>(ProcessPacketAsync);
 
-        _transformBlock = new TransformBlock<PacketData, DecodedFieldsPacket>(async packet =>
-        {
-            Dictionary<string, int> mongoFields = new Dictionary<string, int>();
-            Dictionary<string, double> kafkaFields = new Dictionary<string, double>();
-
-            foreach (IcdField field in _icd)
-            {
-                double value = DecodeFieldValue(packet, field);
-
-                if (field.Name.Equals(ConstantPackets.FLIGHT_ID))
-                {
-                    kafkaFields[field.Name] = value;
-                    mongoFields[field.Name] = (int)value;
-                }
-                else if (_flightHeader.MongoFields.Contains(field.Name))
-                {
-                    mongoFields[field.Name] = (int)value;
-                }
-                else
-                {
-                    kafkaFields[field.Name] = value;
-                }
-            }
-            await _telemetryMongo.SaveTelemetryAsync(mongoFields);
-            return new DecodedFieldsPacket(kafkaFields);
-        });
 
     }
     public ITargetBlock<PacketData> Input => _transformBlock;
@@ -73,4 +38,41 @@ public class DecoderBlock : IDecoderBlock
         ulong rawValue = _bitOperations.ReadBits(packet.Payload, absoluteOffset, icdField.SizeBits);
         return rawValue * icdField.Scale + icdField.Min;
     }
+
+    private async Task<DecodedFieldsPacket> ProcessPacketAsync(PacketData packet)
+    {
+        Dictionary<string, int> databaseFields = new Dictionary<string, int>();
+        Dictionary<string, double> streamingFields = new Dictionary<string, double>();
+
+        foreach (IcdField field in _icd)
+        {
+            double value = DecodeFieldValue(packet, field);
+            AssignField(field, value, databaseFields, streamingFields);
+        }
+        await _telemetryMongo.StoreFlightDataAsync(databaseFields);
+        return new DecodedFieldsPacket(streamingFields);
+
+    }
+
+    private void AssignField(IcdField field, double value, Dictionary<string, int> databaseFields,
+        Dictionary<string, double> streamingFields)
+    {
+        string name = field.Name;
+
+        if (name.Equals(ConstantPackets.FLIGHT_ID))
+        {
+            streamingFields[name] = value;
+            databaseFields[name] = (int)value;
+            return;
+        }
+
+        if (_flightHeader.FlightHeader.Contains(name))
+        {
+            databaseFields[name] = (int)value;
+            return;
+        }
+
+        streamingFields[name] = value;
+    }
+
 }

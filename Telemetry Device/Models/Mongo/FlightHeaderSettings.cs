@@ -4,6 +4,6 @@
     {
         public const string SectionName = "FlightHeader";
 
-        public List<string> MongoFields { get; set; }
+        public List<string> FlightHeader { get; set; } = new();
     }
 }

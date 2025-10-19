@@ -36,17 +36,14 @@ builder.Services.AddSingleton<IFileOperations, FileOperations>();
 builder.Services.AddSingleton<IUdpChecksumCalculator, UdpChecksumCalculator>();
 builder.Services.AddSingleton<IKafkaSendMessage>(serviceProvider =>
     new KafkaSendMessage(ConstantKafka.KAFKA_ADDRESS));
+builder.Services.AddScoped<KafkaProducerBlock>();
 
-builder.Services.AddScoped<KafkaProducerBlock>(serviceProvider =>
-{
-    IKafkaSendMessage kafkaService = serviceProvider.GetRequiredService<IKafkaSendMessage>();
-    return new KafkaProducerBlock(kafkaService, ConstantKafka.TOPIC_NAME);
-});
+
 
 builder.Services.Configure<FlightHeaderSettings>(
     builder.Configuration.GetSection(FlightHeaderSettings.SectionName));
 
-builder.Services.AddSingleton<TelemetryMongo>();
+builder.Services.AddSingleton<FlightTelemetryMongoProxy>();
 
 
 WebApplication app = builder.Build();
