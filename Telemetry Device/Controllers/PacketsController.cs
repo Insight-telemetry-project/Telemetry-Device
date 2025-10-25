@@ -31,6 +31,8 @@ namespace Telemetry_Device.Controllers
         }
         
         [HttpPost("decode-stream-file")]
+        [RequestFormLimits(MultipartBodyLengthLimit = 200_000_000)]
+        [RequestSizeLimit(200_000_000)]
         public async IAsyncEnumerable<DecodedFieldsPacket> DecodeStream([FromForm, Required] IFormFile pcapFile)
         {
             string tempFilePath = _fileOperations.GetFullPath(pcapFile.FileName);
