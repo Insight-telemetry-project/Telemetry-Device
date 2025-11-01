@@ -31,21 +31,22 @@ namespace Telemetry_Device.Services.Mongo
             int masterIndex = fields[ConstantPackets.FLIGHT_ID];
             fields.Remove(ConstantPackets.FLIGHT_ID);
 
-            bool exists = await telemetryCollection
-                .Find(record => record.MasterIndex == masterIndex)
-                .AnyAsync();
-
-            if (!exists)
+            FlightTelemetryRecord telemetryRecord = new FlightTelemetryRecord
             {
-                FlightTelemetryRecord telemetryRecord = new FlightTelemetryRecord
-                {
-                    MasterIndex = masterIndex,
-                    Fields = fields
-                };
+                MasterIndex = masterIndex,
+                Fields = fields
+            };
 
+            try
+            {
                 await telemetryCollection.InsertOneAsync(telemetryRecord);
             }
+            catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
+            {
+                // ignore and continue silently
+            }
         }
+
 
         private async Task EnsureIndexesCreatedAsync()
         {
