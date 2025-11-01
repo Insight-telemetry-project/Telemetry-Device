@@ -29,25 +29,24 @@ namespace Telemetry_Device.Controllers
             _kafka = kafka;
             _fileOperations = fileOperations;
         }
-        
+
         [HttpPost("decode-stream-file")]
         [RequestFormLimits(MultipartBodyLengthLimit = 200_000_000)]
         [RequestSizeLimit(200_000_000)]
-        public async IAsyncEnumerable<DecodedFieldsPacket> DecodeStream([FromForm, Required] IFormFile pcapFile)
+        public async Task<IActionResult> DecodeStream([FromForm, Required] IFormFile pcapFile)
         {
             string tempFilePath = _fileOperations.GetFullPath(pcapFile.FileName);
             using (FileStream stream = new FileStream(tempFilePath, FileMode.Create))
             {
                 await pcapFile.CopyToAsync(stream);
             }
-            await foreach (DecodedFieldsPacket packet in _pipeline.RunPipelineStreamAsync(tempFilePath))
-            {
-                yield return packet;
-            }
+
+            await _pipeline.RunPipelineStreamAsync(tempFilePath);
             System.IO.File.Delete(tempFilePath);
+            return Ok();
         }
-       
     }
 
 }
+
 
