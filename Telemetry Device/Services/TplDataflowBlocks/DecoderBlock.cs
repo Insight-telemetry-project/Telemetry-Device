@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
 using SendRecieveUDP.Model.Interfaces.BitManipulation;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Telemetry_Device.Models.Constant;
 using Telemetry_Device.Models.Interface.Icd;
@@ -17,6 +19,7 @@ public class DecoderBlock : IDecoderBlock
     private readonly TransformBlock<PacketData, DecodedFieldsPacket> _transformBlock;
     private readonly FlightHeaderSettings _flightHeader;
     private readonly FlightTelemetryMongoProxy _telemetryMongo;
+
     public DecoderBlock(IBitOperations bitOperations, IIcdProvider icdProvider, IOptions<FlightHeaderSettings> flightHeaderOptions, FlightTelemetryMongoProxy telemetryMongo)
     {
         _bitOperations = bitOperations;
@@ -25,9 +28,15 @@ public class DecoderBlock : IDecoderBlock
         _flightHeader = flightHeaderOptions.Value;
         _telemetryMongo = telemetryMongo;
 
-        _transformBlock = new TransformBlock<PacketData, DecodedFieldsPacket>(ProcessPacketAsync);
-
+        _transformBlock = new TransformBlock<PacketData, DecodedFieldsPacket>(
+            ProcessPacketAsync,
+            new ExecutionDataflowBlockOptions
+            {
+                MaxDegreeOfParallelism = Environment.ProcessorCount,
+                EnsureOrdered = false
+            });
     }
+
     public ITargetBlock<PacketData> Input => _transformBlock;
     public ISourceBlock<DecodedFieldsPacket> Output => _transformBlock;
 
@@ -40,6 +49,8 @@ public class DecoderBlock : IDecoderBlock
 
     private async Task<DecodedFieldsPacket> ProcessPacketAsync(PacketData packet)
     {
+        System.Diagnostics.Debug.WriteLine($"[DECODER] {packet.Checksum}");
+
         Dictionary<string, int> databaseFields = new Dictionary<string, int>();
         Dictionary<string, double> streamingFields = new Dictionary<string, double>();
 
@@ -48,13 +59,12 @@ public class DecoderBlock : IDecoderBlock
             double value = DecodeFieldValue(packet, field);
             AssignField(field, value, databaseFields, streamingFields);
         }
+
         await _telemetryMongo.StoreFlightDataAsync(databaseFields);
         return new DecodedFieldsPacket(streamingFields);
-
     }
 
-    private void AssignField(IcdField field, double value, Dictionary<string, int> databaseFields,
-        Dictionary<string, double> streamingFields)
+    private void AssignField(IcdField field, double value, Dictionary<string, int> databaseFields, Dictionary<string, double> streamingFields)
     {
         string name = field.Name;
 
@@ -73,5 +83,4 @@ public class DecoderBlock : IDecoderBlock
 
         streamingFields[name] = value;
     }
-
 }
