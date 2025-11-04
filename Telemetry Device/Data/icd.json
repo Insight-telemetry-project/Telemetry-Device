@@ -35,7 +35,6 @@
 		"Min": -50,
 		"Max": 50
 	},
-
 	{
 		"Name": "FQtyL",
 		"Units": "kg",
@@ -63,7 +62,6 @@
 		"Min": 0,
 		"Max": 100
 	},
-
 	{
 		"Name": "E1 OilT",
 		"Units": "C",
@@ -82,7 +80,6 @@
 		"Min": 0,
 		"Max": 500
 	},
-
 	{
 		"Name": "E1 RPM",
 		"Units": "rpm",
@@ -92,7 +89,6 @@
 		"Min": 0,
 		"Max": 10000
 	},
-
 	{
 		"Name": "E1 CHT1",
 		"Units": "C",
@@ -129,7 +125,6 @@
 		"Min": 0,
 		"Max": 800
 	},
-
 	{
 		"Name": "E1 EGT1",
 		"Units": "C",
@@ -166,7 +161,6 @@
 		"Min": 0,
 		"Max": 4000
 	},
-
 	{
 		"Name": "OAT",
 		"Units": "C",
@@ -185,7 +179,6 @@
 		"Min": 0,
 		"Max": 500
 	},
-
 	{
 		"Name": "VSpd",
 		"Units": "ft/min",
@@ -204,7 +197,6 @@
 		"Min": -20,
 		"Max": 20
 	},
-
 	{
 		"Name": "AltMSL",
 		"Units": "ft",
@@ -214,20 +206,19 @@
 		"Min": 0,
 		"Max": 50000
 	},
-
 	{
 		"Name": "timestep",
-		"Units": "ticks",
+		"Units": "epoch_seconds",
 		"BitOffset": 311,
-		"SizeBits": 17,
+		"SizeBits": 32,
 		"Scale": 1.0,
 		"Min": 0,
-		"Max": 100000
+		"Max": 4294967295
 	},
 	{
 		"Name": "cluster",
 		"Units": "id",
-		"BitOffset": 328,
+		"BitOffset": 343,
 		"SizeBits": 7,
 		"Scale": 1.0,
 		"Min": 0,
@@ -236,17 +227,16 @@
 	{
 		"Name": "Master Index",
 		"Units": "idx",
-		"BitOffset": 335,
+		"BitOffset": 350,
 		"SizeBits": 17,
 		"Scale": 1.0,
 		"Min": 0,
 		"Max": 100000
 	},
-
 	{
 		"Name": "date_diff",
 		"Units": "days",
-		"BitOffset": 352,
+		"BitOffset": 367,
 		"SizeBits": 10,
 		"Scale": 1.0,
 		"Min": 0,
@@ -255,7 +245,7 @@
 	{
 		"Name": "flight_length",
 		"Units": "min",
-		"BitOffset": 362,
+		"BitOffset": 377,
 		"SizeBits": 17,
 		"Scale": 1.0,
 		"Min": 0,
@@ -264,7 +254,7 @@
 	{
 		"Name": "number_flights_before",
 		"Units": "cnt",
-		"BitOffset": 379,
+		"BitOffset": 394,
 		"SizeBits": 8,
 		"Scale": 1.0,
 		"Min": -100,
