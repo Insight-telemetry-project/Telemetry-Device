@@ -60,7 +60,16 @@ public class DecoderBlock : IDecoderBlock
             AssignField(field, value, databaseFields, streamingFields);
         }
 
-        await _telemetryMongo.StoreFlightDataAsync(databaseFields);
+
+        int masterIndex = databaseFields[ConstantPackets.FLIGHT_ID];
+
+        if (!_telemetryMongo.ExistingMasterIndexes.Contains(masterIndex))
+        {
+            await _telemetryMongo.StoreFlightDataAsync(databaseFields);
+            _telemetryMongo.existingMasterIndexes.Add(masterIndex);
+        }
+
+
         return new DecodedFieldsPacket(streamingFields);
     }
 
