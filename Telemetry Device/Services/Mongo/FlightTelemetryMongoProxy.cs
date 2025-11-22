@@ -14,6 +14,9 @@ namespace Telemetry_Device.Services.Mongo
         private readonly IMongoCollection<FlightTelemetryRecord> telemetryCollection;
         private bool _isIndexCreated = false;
 
+        public readonly HashSet<int> existingMasterIndexes = new();
+        public IReadOnlyCollection<int> ExistingMasterIndexes => existingMasterIndexes;
+
         public FlightTelemetryMongoProxy(IOptions<MongoSettings> mongoOptions)
         {
             MongoSettings mongoSettings = mongoOptions.Value;
@@ -61,6 +64,31 @@ namespace Telemetry_Device.Services.Mongo
             }
         }
 
+        public async Task RefreshMasterIndexCacheAsync()
+        {
+            List<int> masterIndexes = await telemetryCollection
+                .Find(FilterDefinition<FlightTelemetryRecord>.Empty)
+                .Project(record => record.MasterIndex)
+                .ToListAsync();
+
+            existingMasterIndexes.Clear();
+            foreach (int index in masterIndexes)
+            {
+                existingMasterIndexes.Add(index);
+            }
+        }
+
+        public async Task InitializeCacheAsync()
+        {
+            List<int> allMasterIndexes = await telemetryCollection
+                .Find(_ => true)
+                .Project(record => record.MasterIndex)
+                .ToListAsync();
+
+            existingMasterIndexes.Clear();
+            foreach (int id in allMasterIndexes)
+                existingMasterIndexes.Add(id);
+        }
 
     }
 }

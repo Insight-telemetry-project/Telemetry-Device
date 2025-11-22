@@ -6,6 +6,7 @@ using Telemetry_Device.Models.Interface.TplBlocks;
 using Telemetry_Device.Models.Interface.TplDataflowBlocks;
 using Telemetry_Device.Models.Packets;
 using Telemetry_Device.Services.Kafka;
+using Telemetry_Device.Services.Mongo;
 
 namespace Telemetry_Device.Services.TplDataflowBlocks
 {
@@ -14,16 +15,21 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
         private readonly IBuilderBlock _builderBlock;
         private readonly IDecoderBlock _decoderBlock;
         private readonly KafkaProducerBlock _kafkaProducerBlock;
+        private readonly FlightTelemetryMongoProxy _telemetryMongo;
 
-        public PacketPipelineService(IBuilderBlock builderBlock, IDecoderBlock decoderBlock, KafkaProducerBlock kafkaProducerBlock)
+        public PacketPipelineService(IBuilderBlock builderBlock, IDecoderBlock decoderBlock, KafkaProducerBlock kafkaProducerBlock,
+            FlightTelemetryMongoProxy flightTelemetryMongo)
         {
             _builderBlock = builderBlock;
             _decoderBlock = decoderBlock;
             _kafkaProducerBlock = kafkaProducerBlock;
+            _telemetryMongo = flightTelemetryMongo;
         }
 
         public async Task RunPipelineStreamAsync(string pcapFilePath)
         {
+            await _telemetryMongo.InitializeCacheAsync();
+
             LinkBlocks(_builderBlock.Output, _decoderBlock.Input);
 
             TransformBlock<DecodedFieldsPacket, string> jsonConverter =
