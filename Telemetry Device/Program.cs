@@ -55,6 +55,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
+
+app.UseCors("AngularDev");
+
 app.MapControllers();
 
 app.Run();
