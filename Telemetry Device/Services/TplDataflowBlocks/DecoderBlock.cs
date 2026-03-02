@@ -19,6 +19,8 @@ public class DecoderBlock : IDecoderBlock
     private readonly TransformBlock<PacketData, DecodedFieldsPacket> _transformBlock;
     private readonly FlightHeaderSettings _flightHeader;
     private readonly FlightTelemetryMongoProxy _telemetryMongo;
+    public int? MasterIndex => _masterIndex;
+    private int? _masterIndex;
 
     public DecoderBlock(IBitOperations bitOperations, IIcdProvider icdProvider, IOptions<FlightHeaderSettings> flightHeaderOptions, FlightTelemetryMongoProxy telemetryMongo)
     {
@@ -62,6 +64,12 @@ public class DecoderBlock : IDecoderBlock
 
 
         int masterIndex = databaseFields[ConstantPackets.FLIGHT_ID];
+
+
+        if (_masterIndex == null)
+        {
+            _masterIndex = masterIndex;
+        }
 
         if (!_telemetryMongo.ExistingMasterIndexes.Contains(masterIndex))
         {

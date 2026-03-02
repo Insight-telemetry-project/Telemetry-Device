@@ -9,6 +9,6 @@ namespace Telemetry_Device.Models.Interface.TplDataflowBlocks
         double DecodeFieldValue(PacketData packet, IcdField icdField);
         ITargetBlock<PacketData> Input { get; }
         ISourceBlock<DecodedFieldsPacket> Output { get; }
-
+        int? MasterIndex { get; }
     }
 }
