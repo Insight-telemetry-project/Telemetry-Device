@@ -44,7 +44,11 @@ builder.Services.Configure<FlightHeaderSettings>(
     builder.Configuration.GetSection(FlightHeaderSettings.SectionName));
 
 builder.Services.AddSingleton<FlightTelemetryMongoProxy>();
-
+builder.Services.AddScoped<PacketCountingBlock>();
+builder.Services.AddHttpClient<IFlightCompletionNotifier, FlightCompletionNotifier>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7056/");
+});
 
 WebApplication app = builder.Build();
 
