@@ -31,7 +31,7 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
             _notifier = flightCompletionNotifier;
         }
 
-        public async Task RunPipelineStreamAsync(string pcapFilePath)
+        public async Task<int> RunPipelineStreamAsync(string pcapFilePath)
         {
             await _telemetryMongo.InitializeCacheAsync();
 
@@ -62,6 +62,7 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
             await _notifier.NotifyFlightCompletedAsync(masterIndex, totalPackets);
 
             await jsonConverter.Completion;
+            return masterIndex;
         }
 
         private static void LinkBlocks<T>(ISourceBlock<T> source, ITargetBlock<T> target)
