@@ -8,13 +8,17 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
     public class KafkaProducerBlock
     {
         private readonly ActionBlock<string> _block;
-
+        private int _producedCount = 0;
         public KafkaProducerBlock(IKafkaSendMessage kafka)
         {
             _block = new ActionBlock<string>(async message =>
             {
                 await kafka.SendMessageAsync(ConstantKafka.TOPIC_NAME, message);
-                System.Diagnostics.Debug.WriteLine("[KAFKA] Produced");
+
+                _producedCount++;
+
+                Console.WriteLine(
+                    $"[KAFKA] Produced message #{_producedCount}");
             },
             new ExecutionDataflowBlockOptions
             {
