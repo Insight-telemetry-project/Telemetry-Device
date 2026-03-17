@@ -34,7 +34,6 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
         public async Task<int> RunPipelineStreamAsync(string pcapFilePath)
         {
             await _telemetryMongo.InitializeCacheAsync();
-
             LinkBlocks(_builderBlock.Output, _countingBlock.Input);
             LinkBlocks(_countingBlock.Output, _decoderBlock.Input);
 
@@ -54,14 +53,13 @@ namespace Telemetry_Device.Services.TplDataflowBlocks
             _builderBlock.Input.Complete();
 
             await _kafkaProducerBlock.KafkaBlock.Completion;
-
+            await jsonConverter.Completion;
 
             int masterIndex = _decoderBlock.MasterIndex.Value;
             int totalPackets = _countingBlock.PacketCount;
 
             await _notifier.NotifyFlightCompletedAsync(masterIndex, totalPackets);
 
-            await jsonConverter.Completion;
             return masterIndex;
         }
 
