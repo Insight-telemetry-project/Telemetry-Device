@@ -34,8 +34,11 @@ builder.Services.AddScoped<PacketPipelineService>();
 
 builder.Services.AddSingleton<IFileOperations, FileOperations>();
 builder.Services.AddSingleton<IUdpChecksumCalculator, UdpChecksumCalculator>();
-builder.Services.AddSingleton<IKafkaSendMessage>(serviceProvider =>
-    new KafkaSendMessage(ConstantKafka.KAFKA_ADDRESS));
+
+
+builder.Services.Configure<KafkaSettings>(builder.Configuration.GetSection("Kafka"));
+builder.Services.AddSingleton<IKafkaSendMessage, KafkaSendMessage>();
+
 builder.Services.AddScoped<KafkaProducerBlock>();
 
 
@@ -47,7 +50,7 @@ builder.Services.AddSingleton<FlightTelemetryMongoProxy>();
 builder.Services.AddScoped<PacketCountingBlock>();
 builder.Services.AddHttpClient<IFlightCompletionNotifier, FlightCompletionNotifier>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7056/");
+    client.BaseAddress = new Uri(builder.Configuration["MongoConsumer:BaseUrl"]!);
 });
 
 WebApplication app = builder.Build();
