@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.DataProtection.KeyManagement;
+﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using static MongoDB.Driver.WriteConcern;
 
 namespace Telemetry_Device.Models.Schema
 {
     public class FlightTelemetryRecord
     {
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; } = string.Empty;
+
         [BsonElement("Master Index")]
         public int MasterIndex { get; set; }
 

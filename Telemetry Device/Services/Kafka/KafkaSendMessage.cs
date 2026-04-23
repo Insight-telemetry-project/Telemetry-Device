@@ -1,37 +1,35 @@
 using Confluent.Kafka;
-using System.Diagnostics;
+using Microsoft.Extensions.Options;
+using Telemetry_Device.Models.Configuration;
 using Telemetry_Device.Models.Interface.Kafka;
 
 namespace Telemetry_Device.Services.Kafka
 {
-    public class KafkaSendMessage: IKafkaSendMessage
+    public class KafkaSendMessage : IKafkaSendMessage
     {
-        private readonly IProducer<Null, string> _producer;
+        private readonly IOptions<KafkaSettings> _settings;
+        private IProducer<Null, string>? _producer;
 
-        public KafkaSendMessage(string bootstrapServers)
+        public KafkaSendMessage(IOptions<KafkaSettings> settings)
         {
-            ProducerConfig config = new ProducerConfig
-            {
-                BootstrapServers = bootstrapServers
-            };
-
-            _producer = new ProducerBuilder<Null, string>(config).Build();
+            _settings = settings;
         }
+
+        private IProducer<Null, string> Producer =>
+            _producer ??= new ProducerBuilder<Null, string>(new ProducerConfig
+            {
+                BootstrapServers = _settings.Value.BootstrapServers
+            }).Build();
 
         public async Task SendMessageAsync(string topic, string message)
         {
             try
             {
-                DeliveryResult<Null, string> delivery = await _producer.ProduceAsync(
-                    topic,
-                    new Message<Null, string> { Value = message });
-
-                Debug.WriteLine($"Delivered '{delivery.Value}' to {delivery.TopicPartitionOffset}");
+                await Producer.ProduceAsync(topic, new Message<Null, string> { Value = message });
             }
             catch (ProduceException<Null, string> exception)
             {
-                Debug.WriteLine($"Delivery failed: {exception.Error.Reason}");
-
+                Console.WriteLine($"Delivery failed: {exception.Error.Reason}");
             }
         }
     }
