@@ -41,9 +41,9 @@ namespace Telemetry_Device.Controllers
                 await pcapFile.CopyToAsync(stream);
             }
 
-            int m=await _pipeline.RunPipelineStreamAsync(tempFilePath);
+            int flightId=await _pipeline.RunPipelineStreamAsync(tempFilePath);
             System.IO.File.Delete(tempFilePath);
-            return Ok(m);
+            return Ok(flightId);
         }
 
     }
